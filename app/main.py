@@ -1,4 +1,3 @@
-
 # DOCUMIND - MAIN STREAMLIT APP
 # This file creates the complete chat interface
 
@@ -98,6 +97,9 @@ if 'document_processed' not in st.session_state:
 if 'document_name' not in st.session_state:
     st.session_state.document_name = None
 
+if 'answer_mode' not in st.session_state:
+    st.session_state.answer_mode = "auto"
+
 
 # INITIALIZE MODEL
 
@@ -162,6 +164,24 @@ with st.sidebar:
         st.success(f"✅ Active: {st.session_state.document_name}")
     else:
         st.warning("⚠️ No document uploaded")
+
+    st.markdown("---")
+
+    # Answer mode toggle
+    st.markdown("## ⚙️ Answer Mode")
+    answer_mode = st.radio(
+        "Choose how answers are generated:",
+        options=["Auto (Smart)", "Generative (AI)", "Extractive (Local)"],
+        index=0,
+        help="Auto tries AI-generated answers first, then falls back to local search if unavailable."
+    )
+
+    mode_map = {
+        "Auto (Smart)": "auto",
+        "Generative (AI)": "generative",
+        "Extractive (Local)": "extractive"
+    }
+    st.session_state.answer_mode = mode_map[answer_mode]
 
     st.markdown("---")
 
@@ -271,7 +291,8 @@ if st.session_state.document_processed:
         with st.spinner("🤔 Thinking..."):
             result = ask_question(
                 question,
-                st.session_state.model
+                st.session_state.model,
+                mode=st.session_state.get('answer_mode', 'auto')
             )
 
         if result:

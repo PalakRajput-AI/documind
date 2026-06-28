@@ -8,3 +8,4 @@ pypdf2
 python-docx
 python-dotenv
 tiktoken
+groq
